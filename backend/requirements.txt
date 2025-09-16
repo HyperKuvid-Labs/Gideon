@@ -19,7 +19,7 @@ pydantic[email]
 starlette
 python-multipart
 itsdangerous
-openai
+openai>=1.0.0
 pillow
 google-api-python-client
 websockets

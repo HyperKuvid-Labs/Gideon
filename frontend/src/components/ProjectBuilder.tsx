@@ -281,7 +281,7 @@ const AppBuilder = () => {
 
       console.log(appRequest);
   
-      const response = await fetch("https://ec2-16-16-146-220.eu-north-1.compute.amazonaws.com/run_project_builder", {
+      const response = await fetch("http://localhost:8000/run_project_builder", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"

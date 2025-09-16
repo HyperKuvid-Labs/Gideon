@@ -63,14 +63,17 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
-				// Neon theme colors
-				neon: {
-					blue: '#00BFFF',
-					purple: '#C084FC',
-					green: '#00FFA3',
-					dark: '#0D1117',
-					text: '#F0F4F8',
-					muted: '#6B7280'
+				// Notion semantic colors
+				notion: {
+					gray: 'hsl(var(--notion-gray))',
+					brown: 'hsl(var(--notion-brown))',
+					orange: 'hsl(var(--notion-orange))',
+					yellow: 'hsl(var(--notion-yellow))',
+					green: 'hsl(var(--notion-green))',
+					blue: 'hsl(var(--notion-blue))',
+					purple: 'hsl(var(--notion-purple))',
+					pink: 'hsl(var(--notion-pink))',
+					red: 'hsl(var(--notion-red))'
 				}
 			},
 			borderRadius: {
@@ -95,34 +98,59 @@ export default {
 						height: '0'
 					}
 				},
-				'neon-pulse': {
-					'0%, 100%': {
-						boxShadow: '0 0 5px #00BFFF, 0 0 10px #00BFFF, 0 0 15px #00BFFF'
+				'fade-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateY(10px)'
 					},
-					'50%': {
-						boxShadow: '0 0 10px #00BFFF, 0 0 20px #00BFFF, 0 0 30px #00BFFF'
+					'100%': {
+						opacity: '1',
+						transform: 'translateY(0)'
 					}
 				},
-				'float': {
-					'0%, 100%': { transform: 'translateY(0px)' },
-					'50%': { transform: 'translateY(-10px)' }
+				'slide-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'translateX(-10px)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'translateX(0)'
+					}
 				},
-				'glow': {
-					'0%, 100%': { opacity: '1' },
-					'50%': { opacity: '0.5' }
+				'scale-in': {
+					'0%': {
+						opacity: '0',
+						transform: 'scale(0.95)'
+					},
+					'100%': {
+						opacity: '1',
+						transform: 'scale(1)'
+					}
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out',
-				'neon-pulse': 'neon-pulse 2s ease-in-out infinite',
-				'float': 'float 3s ease-in-out infinite',
-				'glow': 'glow 2s ease-in-out infinite alternate'
+				'fade-in': 'fade-in 0.3s ease-out',
+				'slide-in': 'slide-in 0.3s ease-out',
+				'scale-in': 'scale-in 0.2s ease-out'
 			},
 			boxShadow: {
-				'neon-blue': '0 0 5px #00BFFF, 0 0 10px #00BFFF, 0 0 15px #00BFFF',
-				'neon-purple': '0 0 5px #C084FC, 0 0 10px #C084FC, 0 0 15px #C084FC',
-				'neon-green': '0 0 5px #00FFA3, 0 0 10px #00FFA3, 0 0 15px #00FFA3'
+				'notion-sm': '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+				'notion': '0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)',
+				'notion-md': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+				'notion-lg': '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)',
+				'notion-xl': '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)'
+			},
+			spacing: {
+				'18': '4.5rem',
+				'88': '22rem',
+				'128': '32rem'
+			},
+			fontSize: {
+				'xxs': ['0.625rem', { lineHeight: '0.75rem' }],
+				'2xs': ['0.6875rem', { lineHeight: '0.875rem' }]
 			}
 		}
 	},

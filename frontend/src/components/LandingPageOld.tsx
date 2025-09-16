@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight, Sparkles, Zap, Shield, Globe, MessageSquare, Code, Users, Star, Play, ChevronRight, LogIn, UserPlus, CheckCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import ThemeToggle from './ThemeToggle';
 
 const LandingPage = () => {
   const [activeFeature, setActiveFeature] = useState(0);
@@ -23,6 +22,15 @@ const LandingPage = () => {
     };
 
     checkAuth();
+  }, []);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition({ x: e.clientX, y: e.clientY });
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
   useEffect(() => {
@@ -87,7 +95,7 @@ const LandingPage = () => {
   };
 
   const handleGoogleAuth = () => {
-    window.location.href = 'http://localhost:8000/login/google';
+    window.location.href = 'https://ec2-16-16-146-220.eu-north-1.compute.amazonaws.com/login/google';
   };
 
   if (isLoading) {
@@ -153,7 +161,6 @@ const LandingPage = () => {
         </motion.div>
 
         <div className="flex items-center gap-4">
-          <ThemeToggle />
           {isAuthenticated ? (
             <motion.div
               whileHover={{ scale: 1.02 }}
@@ -169,20 +176,26 @@ const LandingPage = () => {
             </motion.div>
           ) : (
             <div className="flex items-center gap-3">
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <motion.div
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button
+                  variant="ghost"
                   onClick={handleSignIn}
-                  variant="outline"
-                  className="border border-border hover:bg-secondary text-foreground smooth-transition"
+                  className="text-white hover:text-purple-300 hover:bg-purple-500/10"
                 >
                   <LogIn className="w-4 h-4 mr-2" />
                   Sign In
                 </Button>
               </motion.div>
-              <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <motion.div
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
                 <Button
                   onClick={handleGetStarted}
-                  className="bg-primary hover:bg-primary/90 text-primary-foreground smooth-transition"
+                  className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
                 >
                   <UserPlus className="w-4 h-4 mr-2" />
                   Sign Up
@@ -192,6 +205,21 @@ const LandingPage = () => {
           )}
         </div>
       </motion.nav>
+
+      {/* Cursor follower */}
+      <motion.div
+        className="fixed w-6 h-6 bg-purple-500/30 rounded-full blur-sm pointer-events-none z-50"
+        animate={{
+          x: mousePosition.x - 12,
+          y: mousePosition.y - 12,
+        }}
+        transition={{
+          type: "spring",
+          damping: 30,
+          stiffness: 200,
+          mass: 0.5
+        }}
+      />
 
       <div className="relative z-10 container mx-auto px-6 py-20">
         {/* Hero Section */}
@@ -267,6 +295,9 @@ const LandingPage = () => {
                   Sign In
                 </Button>
               </motion.div>
+            )}
+          </motion.div>
+                                </motion.div>
             )}
           </motion.div>
 
@@ -358,6 +389,212 @@ const LandingPage = () => {
               <ChevronRight className="w-4 h-4 ml-2" />
             </Button>
           </motion.div>
+        </motion.div>
+      </div>
+    </div>
+                </motion.div> */}
+              </>
+            )}
+          </motion.div>
+
+          {/* Authentication Features */}
+          {!isAuthenticated && (
+            <motion.div
+              className="flex flex-wrap justify-center gap-4 mb-8"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+            >
+              {authFeatures.map((feature, index) => (
+                <motion.div
+                  key={feature}
+                  className="flex items-center gap-2 px-4 py-2 bg-slate-800/30 rounded-full border border-slate-700/50"
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.9 + index * 0.1 }}
+                  whileHover={{ scale: 1.05, backgroundColor: 'rgba(147, 51, 234, 0.1)' }}
+                >
+                  <CheckCircle className="w-4 h-4 text-green-400" />
+                  <span className="text-sm text-slate-300">{feature}</span>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Stats Section */}
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 gap-8 mb-20"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+        >
+          {stats.map((stat, index) => (
+            <motion.div
+              key={stat.label}
+              className="text-center p-6 rounded-2xl bg-slate-800/30 backdrop-blur-sm border border-slate-700/50 hover:border-purple-500/30 transition-all duration-300"
+              whileHover={{ scale: 1.05, y: -5 }}
+              transition={{ delay: index * 0.1 }}
+            >
+              <motion.div
+                className="text-3xl font-bold text-purple-400 mb-2"
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ delay: 1 + index * 0.1, type: "spring" }}
+              >
+                {stat.value}
+              </motion.div>
+              <div className="text-slate-400 font-medium">{stat.label}</div>
+            </motion.div>
+          ))}
+        </motion.div>
+
+        {/* Features Section */}
+        <motion.div
+          className="mb-20"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1, duration: 0.8 }}
+        >
+          <div className="text-center mb-16">
+            <motion.h2
+              className="text-5xl font-bold mb-6 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.2 }}
+            >
+              Powerful Features
+            </motion.h2>
+            <motion.p
+              className="text-xl text-slate-400 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.4 }}
+            >
+              Everything you need to harness the full potential of AI technology
+            </motion.p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              const isActive = activeFeature === index;
+              
+              return (
+                <motion.div
+                  key={feature.title}
+                  className={`relative p-8 rounded-2xl backdrop-blur-sm border transition-all duration-500 cursor-pointer group ${
+                    isActive 
+                      ? 'bg-slate-800/50 border-purple-500/50 shadow-2xl shadow-purple-500/10' 
+                      : 'bg-slate-800/20 border-slate-700/30 hover:border-slate-600/50'
+                  }`}
+                  onMouseEnter={() => setActiveFeature(index)}
+                  whileHover={{ scale: 1.02, y: -5 }}
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.6 + index * 0.1, duration: 0.6 }}
+                >
+                  {isActive && (
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-blue-500/5 rounded-2xl"
+                      layoutId="activeFeature"
+                      transition={{ duration: 0.3 }}
+                    />
+                  )}
+                  
+                  <motion.div
+                    className={`relative w-16 h-16 rounded-xl mb-6 flex items-center justify-center bg-gradient-to-br ${feature.color}`}
+                    whileHover={{ rotate: 360, scale: 1.1 }}
+                    transition={{ duration: 0.6 }}
+                  >
+                    <Icon className="w-8 h-8 text-white" />
+                  </motion.div>
+                  
+                  <h3 className="text-xl font-bold text-white mb-3 relative z-10">
+                    {feature.title}
+                  </h3>
+                  <p className="text-slate-400 leading-relaxed relative z-10">
+                    {feature.description}
+                  </p>
+                  
+                  <motion.div
+                    className="mt-6 flex items-center text-purple-400 font-medium group-hover:text-cyan-400 transition-colors relative z-10"
+                    whileHover={{ x: 5 }}
+                  >
+                    Learn more
+                    <ChevronRight className="w-4 h-4 ml-1" />
+                  </motion.div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* CTA Section */}
+        <motion.div
+          className="text-center py-20 relative"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 2, duration: 0.8 }}
+        >
+          <motion.div
+            className="absolute inset-0 bg-gradient-to-r from-purple-500/5 to-blue-500/5 rounded-3xl border border-purple-500/10"
+            animate={{
+              boxShadow: [
+                '0 0 0 0 rgba(147, 51, 234, 0.1)',
+                '0 0 30px 10px rgba(147, 51, 234, 0.1)',
+                '0 0 0 0 rgba(147, 51, 234, 0.1)'
+              ]
+            }}
+            transition={{ duration: 3, repeat: Infinity }}
+          />
+          
+          <div className="relative z-10">
+            <motion.h2
+              className="text-4xl font-bold mb-6 bg-gradient-to-r from-white via-purple-200 to-blue-200 bg-clip-text text-transparent"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.2 }}
+            >
+              {isAuthenticated ? 'Ready to Continue Your Journey?' : 'Ready to Transform Your Workflow?'}
+            </motion.h2>
+            <motion.p
+              className="text-xl text-slate-300 mb-8 max-w-2xl mx-auto"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.4 }}
+            >
+              {isAuthenticated 
+                ? 'Continue exploring the power of AI with advanced chat features and collaborative tools.'
+                : 'Join thousands of developers and creators who are already building the future with Gideon.'
+              }
+            </motion.p>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 2.6 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Button
+                onClick={handleGetStarted}
+                size="lg"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium px-12 py-4 rounded-xl text-lg group relative overflow-hidden"
+              >
+                <motion.div
+                  className="absolute inset-0 bg-white/20"
+                  initial={{ scale: 0, rotate: 45 }}
+                  whileHover={{ scale: 1.5, rotate: 45 }}
+                  transition={{ duration: 0.6 }}
+                />
+                <span className="relative z-10 flex items-center gap-2">
+                  {isAuthenticated ? 'Go to Chat' : 'Get Started Now'}
+                  <Star className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
+                </span>
+              </Button>
+            </motion.div>
+          </div>
         </motion.div>
       </div>
     </div>

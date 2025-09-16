@@ -586,20 +586,38 @@ def ollama_phi_resp(query: str, emotion: str, previous_context : str):
 
 
 def verify_pwd(pwd: str, hpwd: str):
-    return bcrypt.checkpw(pwd.encode("utf-8"), hashed_password=hpwd.encode("utf-8"))
+    try:
+        # Convert the stored hash back to bytes if it's a string
+        if isinstance(hpwd, str):
+            hashed_password = hpwd.encode("utf-8")
+        else:
+            hashed_password = hpwd
+        
+        return bcrypt.checkpw(pwd.encode("utf-8"), hashed_password)
+    except (ValueError, TypeError) as e:
+        print(f"Password verification error: {e}")
+        return False
 
 
 def hash_password(pwd: str):
-    salt = bcrypt.gensalt()
-    hashed = bcrypt.hashpw(pwd.encode("utf-8"), salt=salt)
-    return hashed.decode("utf-8")
+    try:
+        salt = bcrypt.gensalt()
+        hashed = bcrypt.hashpw(pwd.encode("utf-8"), salt)
+        return hashed.decode("utf-8")
+    except Exception as e:
+        print(f"Password hashing error: {e}")
+        raise
 
 
 async def authenticate_user(username: str, password: str):
-    user = await prisma.user.find_first(where={"name": username})
-    if user and verify_pwd(password, user.passwordHash):
-        return user
-    return None
+    try:
+        user = await prisma.user.find_first(where={"name": username})
+        if user and user.passwordHash and verify_pwd(password, user.passwordHash):
+            return user
+        return None
+    except Exception as e:
+        print(f"Authentication error: {e}")
+        return None
 
 
 async def create_access_token(data, expiryTime: Optional[timedelta] = None):

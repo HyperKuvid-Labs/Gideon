@@ -64,7 +64,7 @@ const Signup = () => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('https://ec2-16-16-146-220.eu-north-1.compute.amazonaws.com/register', {
+      const response = await fetch('http://localhost:8000/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ const Signup = () => {
 
   const handleGoogleSignup = () => {
     // Redirect to Google OAuth endpoint
-    window.location.href = 'https://ec2-16-16-146-220.eu-north-1.compute.amazonaws.com/login/google';
+    window.location.href = 'http://localhost:8000/login/google';
   };
 
   const getPasswordStrengthColor = () => {
