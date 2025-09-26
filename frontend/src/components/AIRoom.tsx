@@ -4,8 +4,8 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { 
-  Sparkles, Download, Share2, Heart, Copy, 
+import {
+  Sparkles, Download, Share2, Heart, Copy,
   Palette, Wand2, Image as ImageIcon, Loader2,
   RefreshCw, Settings, Grid3X3, List, Eye,
   Zap, Stars, WandSparkles, Brush
@@ -33,9 +33,9 @@ const ImageStudio = () => {
 
   // Refs for GSAP animations
   const containerRef = useRef<HTMLDivElement>(null);
-  const promptRef = useRef<HTMLDivElement>(null);
+  const promptRef = useRef<HTMLInputElement>(null);
   const imagesRef = useRef<HTMLDivElement>(null);
-  const floatingElementsRef = useRef<HTMLDivElement[]>([]);
+  const floatingElementsRef = useRef<(HTMLDivElement | null)[]>([]);
 
   // Style suggestions (like music genres in Suno)
   const stylePrompts = [
@@ -50,22 +50,22 @@ const ImageStudio = () => {
   // GSAP animations on mount
   useEffect(() => {
     if (containerRef.current) {
-      gsap.fromTo(containerRef.current, 
-        { opacity: 0, y: 50 },
-        { opacity: 1, y: 0, duration: 1, ease: "power3.out" }
+      gsap.fromTo(containerRef.current,
+        { opacity: 0, y: 20 },
+        { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }
       );
     }
 
-    // Floating elements animation
+    // Subtle floating elements animation
     floatingElementsRef.current.forEach((el, index) => {
       if (el) {
         gsap.to(el, {
-          y: -20,
-          duration: 2 + index * 0.5,
+          y: -10,
+          duration: 3 + index * 0.2,
           repeat: -1,
           yoyo: true,
-          ease: "power2.inOut",
-          delay: index * 0.3
+          ease: "power1.inOut",
+          delay: index * 0.1
         });
       }
     });
@@ -83,7 +83,6 @@ const ImageStudio = () => {
     }
 
     setIsGenerating(true);
-
     try {
       const response = await generateImage(prompt);
       
@@ -97,12 +96,12 @@ const ImageStudio = () => {
       }));
 
       setGeneratedImages(prev => [...newImages, ...prev]);
-      
+
       // Animate new images in
       if (imagesRef.current) {
-        gsap.fromTo(imagesRef.current.children, 
-          { scale: 0, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.6, stagger: 0.1, ease: "back.out" }
+        gsap.fromTo(imagesRef.current.children,
+          { scale: 0.9, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.4, stagger: 0.05, ease: "power2.out" }
         );
       }
 
@@ -110,7 +109,6 @@ const ImageStudio = () => {
         title: "Images Generated!",
         description: `Created ${newImages.length} images successfully`,
       });
-
     } catch (error) {
       toast({
         title: "Generation Failed",
@@ -124,8 +122,8 @@ const ImageStudio = () => {
 
   // Toggle like
   const toggleLike = (imageId: string) => {
-    setGeneratedImages(prev => 
-      prev.map(img => 
+    setGeneratedImages(prev =>
+      prev.map(img =>
         img.id === imageId ? { ...img, liked: !img.liked } : img
       )
     );
@@ -154,345 +152,246 @@ const ImageStudio = () => {
   };
 
   return (
-    <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 relative overflow-hidden mt-10">
-      {/* Floating background elements */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
+    <div 
+      ref={containerRef}
+      className="min-h-screen bg-white text-black relative overflow-hidden font-inter"
+    >
+      {/* Subtle background elements - Notion style */}
+      <div className="absolute inset-0 pointer-events-none">
+        {[...Array(8)].map((_, i) => (
           <div
             key={i}
-            ref={el => floatingElementsRef.current[i] = el!}
-            className="absolute w-2 h-2 bg-purple-400/20 rounded-full"
+            ref={el => floatingElementsRef.current[i] = el}
+            className="absolute w-1 h-1 bg-gray-200 rounded-full opacity-30"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              animationDelay: `${Math.random() * 2}s`
+              left: `${20 + Math.random() * 60}%`,
+              top: `${20 + Math.random() * 60}%`,
             }}
           />
         ))}
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 container mx-auto px-4 py-8">
-        {/* Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -50 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center mb-12"
-        >
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            >
-              <Sparkles className="w-8 h-8 text-purple-400" />
-            </motion.div>
-            <h1 className="text-6xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-              Image Generation Studio
-            </h1>
-            <motion.div
-              animate={{ rotate: -360 }}
-              transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
-            >
-              <Wand2 className="w-8 h-8 text-pink-400" />
-            </motion.div>
-          </div>
-          <p className="text-xl text-slate-300 max-w-2xl mx-auto">
-            Transform your imagination into stunning visuals with AI-powered image generation
-          </p>
-        </motion.div>
-
-        {/* Generation Interface */}
-        <motion.div 
-          ref={promptRef}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.6, delay: 0.2 }}
-          className="max-w-4xl mx-auto mb-12"
-        >
-          <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50 shadow-2xl">
-            <CardContent className="p-8">
-              {/* Prompt Input */}
-              <div className="space-y-6">
-                <div className="relative">
-                  <Input
-                    value={prompt}
-                    onChange={(e) => setPrompt(e.target.value)}
-                    placeholder="Describe your vision... (e.g., 'A majestic dragon soaring through clouds at sunset')"
-                    className="w-full h-16 text-lg bg-slate-900/50 border-slate-600 text-white placeholder-slate-400 pr-20"
-                    onKeyPress={(e) => {
-                      if (e.key === 'Enter' && !isGenerating) {
-                        handleGenerateImages();
-                      }
-                    }}
-                  />
-                  <motion.div
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                    className="absolute right-2 top-2"
-                  >
-                    <Button
-                      onClick={handleGenerateImages}
-                      disabled={isGenerating || !prompt.trim()}
-                      className="h-12 px-6 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 border-0"
-                    >
-                      {isGenerating ? (
-                        <>
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          Generating...
-                        </>
-                      ) : (
-                        <>
-                          <Zap className="w-5 h-5 mr-2" />
-                          Generate
-                        </>
-                      )}
-                    </Button>
-                  </motion.div>
-                </div>
-
-                {/* Style Suggestions */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-slate-300">
-                    <Palette className="w-4 h-4" />
-                    <span className="text-sm font-medium">Style Suggestions</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                    <AnimatePresence>
-                      {stylePrompts.map((style, index) => (
-                        <motion.div
-                          key={style}
-                          initial={{ opacity: 0, scale: 0.8 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          exit={{ opacity: 0, scale: 0.8 }}
-                          transition={{ delay: index * 0.05 }}
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                        >
-                          <Badge
-                            variant="secondary"
-                            className="cursor-pointer bg-slate-700/50 hover:bg-slate-600/50 text-slate-300 border-slate-600"
-                            onClick={() => addStyleToPrompt(style)}
-                          >
-                            {style}
-                          </Badge>
-                        </motion.div>
-                      ))}
-                    </AnimatePresence>
-                  </div>
-                </div>
+      <div className="relative z-10">
+        {/* Header - Notion style */}
+        <div className="border-b border-gray-100 bg-white/80 backdrop-blur-sm sticky top-0 z-20">
+          <div className="max-w-4xl mx-auto px-6 py-6">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-6 h-6 bg-black rounded flex items-center justify-center">
+                <ImageIcon className="w-4 h-4 text-white" />
               </div>
-            </CardContent>
-          </Card>
-        </motion.div>
-
-        {/* View Controls */}
-        {generatedImages.length > 0 && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex justify-between items-center mb-8"
-          >
-            <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-bold text-white">
-                Generated Images ({generatedImages.length})
-              </h2>
-              <Badge variant="secondary" className="bg-purple-600/20 text-purple-300">
-                <Stars className="w-3 h-3 mr-1" />
-                AI Created
-              </Badge>
+              <h1 className="text-2xl font-medium text-black">Image Studio</h1>
             </div>
-            <div className="flex items-center gap-2">
-              <Button
-                variant={viewMode === 'grid' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('grid')}
-                className="bg-slate-700 hover:bg-slate-600"
-              >
-                <Grid3X3 className="w-4 h-4" />
-              </Button>
-              <Button
-                variant={viewMode === 'list' ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setViewMode('list')}
-                className="bg-slate-700 hover:bg-slate-600"
-              >
-                <List className="w-4 h-4" />
-              </Button>
-            </div>
-          </motion.div>
-        )}
-
-        {/* Images Grid */}
-        <div ref={imagesRef}>
-          <AnimatePresence>
-            {generatedImages.length > 0 ? (
-              <motion.div 
-                className={`grid gap-6 ${
-                  viewMode === 'grid' 
-                    ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' 
-                    : 'grid-cols-1 max-w-2xl mx-auto'
-                }`}
-                layout
-              >
-                {generatedImages.map((image, index) => (
-                  <motion.div
-                    key={image.id}
-                    layout
-                    initial={{ opacity: 0, scale: 0.8, y: 50 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.8, y: -50 }}
-                    transition={{ 
-                      duration: 0.5, 
-                      delay: index * 0.1,
-                      type: "spring",
-                      stiffness: 100
-                    }}
-                    whileHover={{ y: -5 }}
-                    className="group"
-                  >
-                    <Card className="bg-slate-800/50 backdrop-blur-xl border-slate-700/50 overflow-hidden hover:border-purple-500/50 transition-all duration-300">
-                      <div className="relative aspect-square overflow-hidden">
-                        <img
-                          src={image.imageUrl}
-                          alt={image.prompt}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                        />
-                        
-                        {/* Overlay */}
-                        <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                          <div className="flex gap-2">
-                            <motion.button
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              onClick={() => toggleLike(image.id)}
-                              className={`p-2 rounded-full ${
-                                image.liked 
-                                  ? 'bg-red-500 text-white' 
-                                  : 'bg-white/20 text-white hover:bg-white/30'
-                              }`}
-                            >
-                              <Heart className={`w-4 h-4 ${image.liked ? 'fill-current' : ''}`} />
-                            </motion.button>
-                            
-                            <motion.button
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              onClick={() => downloadImage(image.imageUrl, image.prompt)}
-                              className="p-2 rounded-full bg-white/20 text-white hover:bg-white/30"
-                            >
-                              <Download className="w-4 h-4" />
-                            </motion.button>
-                            
-                            <motion.button
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              onClick={() => copyPrompt(image.prompt)}
-                              className="p-2 rounded-full bg-white/20 text-white hover:bg-white/30"
-                            >
-                              <Copy className="w-4 h-4" />
-                            </motion.button>
-                            
-                            <motion.button
-                              whileHover={{ scale: 1.1 }}
-                              whileTap={{ scale: 0.9 }}
-                              onClick={() => setSelectedImage(image)}
-                              className="p-2 rounded-full bg-white/20 text-white hover:bg-white/30"
-                            >
-                              <Eye className="w-4 h-4" />
-                            </motion.button>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <CardContent className="p-4">
-                        <p className="text-sm text-slate-300 line-clamp-2 mb-2">
-                          {image.prompt}
-                        </p>
-                        <div className="flex items-center justify-between text-xs text-slate-400">
-                          <span>{image.timestamp.toLocaleTimeString()}</span>
-                          <div className="flex items-center gap-1">
-                            <WandSparkles className="w-3 h-3" />
-                            <span>AI Generated</span>
-                          </div>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  </motion.div>
-                ))}
-              </motion.div>
-            ) : !isGenerating && (
-              <motion.div 
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-20"
-              >
-                <div className="max-w-md mx-auto">
-                  <motion.div
-                    animate={{ y: [0, -10, 0] }}
-                    transition={{ duration: 2, repeat: Infinity }}
-                    className="mb-6"
-                  >
-                    <ImageIcon className="w-16 h-16 text-slate-500 mx-auto" />
-                  </motion.div>
-                  <h3 className="text-xl font-semibold text-slate-300 mb-2">
-                    No images generated yet
-                  </h3>
-                  <p className="text-slate-400">
-                    Enter a prompt above and click generate to create your first AI image
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+            <p className="text-gray-600 text-sm leading-relaxed">
+              Transform your ideas into visual reality with AI-powered image generation
+            </p>
+          </div>
         </div>
 
-        {/* Loading Animation */}
-        <AnimatePresence>
-          {isGenerating && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50"
-            >
-              <motion.div
-                initial={{ scale: 0.8, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                exit={{ scale: 0.8, opacity: 0 }}
-                className="bg-slate-800 rounded-2xl p-8 text-center max-w-md mx-4"
+        {/* Generation Interface */}
+        <div className="max-w-4xl mx-auto px-6 py-8">
+          {/* Prompt Input - Notion style */}
+          <div className="mb-8">
+            <div className="relative">
+              <Input
+                ref={promptRef}
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="Describe what you want to create..."
+                className="w-full h-12 text-base bg-white border-gray-200 text-black placeholder-gray-400 pr-24 focus:border-gray-400 focus:ring-0 rounded-md"
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !isGenerating) {
+                    handleGenerateImages();
+                  }
+                }}
+              />
+              <Button
+                onClick={handleGenerateImages}
+                disabled={isGenerating}
+                className="absolute right-2 top-2 h-8 px-4 bg-black text-white hover:bg-gray-800 disabled:bg-gray-300 text-sm rounded"
               >
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                  className="w-16 h-16 mx-auto mb-4"
+                {isGenerating ? (
+                  <>
+                    <Loader2 className="w-3 h-3 mr-2 animate-spin" />
+                    Generating
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3 h-3 mr-2" />
+                    Generate
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+
+          {/* Style Suggestions - Notion style */}
+          <div className="mb-8">
+            <h3 className="text-sm font-medium text-gray-700 mb-3">Style suggestions</h3>
+            <div className="flex flex-wrap gap-2">
+              {stylePrompts.slice(0, 12).map((style, index) => (
+                <button
+                  key={index}
+                  onClick={() => addStyleToPrompt(style)}
+                  className="px-3 py-1.5 text-xs bg-gray-50 hover:bg-gray-100 text-gray-700 rounded border border-gray-200 transition-colors"
                 >
-                  <Sparkles className="w-full h-full text-purple-400" />
-                </motion.div>
-                <h3 className="text-xl font-semibold text-white mb-2">
-                  Creating Magic...
-                </h3>
-                <p className="text-slate-300 mb-4">
-                  AI is generating 4 unique images for you
-                </p>
-                <div className="flex justify-center gap-1">
-                  {[...Array(4)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      animate={{ scale: [1, 1.2, 1] }}
-                      transition={{ 
-                        duration: 1, 
-                        repeat: Infinity, 
-                        delay: i * 0.2 
-                      }}
-                      className="w-2 h-2 bg-purple-400 rounded-full"
-                    />
-                  ))}
-                </div>
-              </motion.div>
-            </motion.div>
+                  {style}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* View Controls - Notion style */}
+          {generatedImages.length > 0 && (
+            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-100">
+              <div className="flex items-center space-x-3">
+                <h2 className="text-lg font-medium text-black">
+                  Generated Images
+                </h2>
+                <Badge variant="secondary" className="bg-gray-100 text-gray-600 text-xs">
+                  {generatedImages.length}
+                </Badge>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Button
+                  onClick={() => setViewMode('grid')}
+                  variant={viewMode === 'grid' ? 'default' : 'ghost'}
+                  size="sm"
+                  className={viewMode === 'grid' 
+                    ? 'bg-black text-white hover:bg-gray-800' 
+                    : 'text-gray-600 hover:bg-gray-50'
+                  }
+                >
+                  <Grid3X3 className="w-4 h-4" />
+                </Button>
+                <Button
+                  onClick={() => setViewMode('list')}
+                  variant={viewMode === 'list' ? 'default' : 'ghost'}
+                  size="sm"
+                  className={viewMode === 'list' 
+                    ? 'bg-black text-white hover:bg-gray-800' 
+                    : 'text-gray-600 hover:bg-gray-50'
+                  }
+                >
+                  <List className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
           )}
-        </AnimatePresence>
+
+          {/* Images Grid - Notion style */}
+          {generatedImages.length > 0 ? (
+            <div
+              ref={imagesRef}
+              className={viewMode === 'grid' 
+                ? "grid grid-cols-1 md:grid-cols-2 gap-6"
+                : "space-y-4"
+              }
+            >
+              {generatedImages.map((image, index) => (
+                <Card key={image.id} className="group bg-white border border-gray-200 hover:border-gray-300 transition-colors overflow-hidden">
+                  <CardContent className="p-0">
+                    <div className="relative aspect-square overflow-hidden">
+                      <img
+                        src={image.imageUrl}
+                        alt={image.prompt}
+                        className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                      />
+                      
+                      {/* Overlay - Notion style */}
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+                        <div className="flex items-center space-x-2">
+                          <Button
+                            onClick={() => toggleLike(image.id)}
+                            size="sm"
+                            className={`p-2 rounded ${
+                              image.liked
+                                ? 'bg-black text-white'
+                                : 'bg-white/90 text-black hover:bg-white'
+                            }`}
+                          >
+                            <Heart className={`w-4 h-4 ${image.liked ? 'fill-current' : ''}`} />
+                          </Button>
+                          
+                          <Button
+                            onClick={() => downloadImage(image.imageUrl, image.prompt)}
+                            size="sm"
+                            className="p-2 bg-white/90 text-black hover:bg-white rounded"
+                          >
+                            <Download className="w-4 h-4" />
+                          </Button>
+                          
+                          <Button
+                            onClick={() => copyPrompt(image.prompt)}
+                            size="sm"
+                            className="p-2 bg-white/90 text-black hover:bg-white rounded"
+                          >
+                            <Copy className="w-4 h-4" />
+                          </Button>
+                          
+                          <Button
+                            onClick={() => setSelectedImage(image)}
+                            size="sm"
+                            className="p-2 bg-white/90 text-black hover:bg-white rounded"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="p-4">
+                      <p className="text-sm text-black mb-2 line-clamp-2 leading-relaxed">
+                        {image.prompt}
+                      </p>
+                      <div className="flex items-center justify-between">
+                        <p className="text-xs text-gray-500">
+                          {image.timestamp.toLocaleTimeString()}
+                        </p>
+                        <Badge variant="outline" className="text-xs border-gray-200 text-gray-600">
+                          AI Generated
+                        </Badge>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : !isGenerating && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <ImageIcon className="w-8 h-8 text-gray-400" />
+              </div>
+              <h3 className="text-lg font-medium text-black mb-2">No images yet</h3>
+              <p className="text-gray-600 text-sm">
+                Enter a prompt above and click generate to create your first AI image
+              </p>
+            </div>
+          )}
+
+          {/* Loading Animation - Notion style */}
+          {isGenerating && (
+            <div className="text-center py-16">
+              <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Loader2 className="w-8 h-8 text-gray-400 animate-spin" />
+              </div>
+              <h3 className="text-lg font-medium text-black mb-2">Creating images</h3>
+              <p className="text-gray-600 text-sm mb-6">
+                AI is generating 4 unique images for you
+              </p>
+              
+              {/* Progress placeholders */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-md mx-auto">
+                {[...Array(4)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="aspect-square bg-gray-100 rounded-lg animate-pulse"
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

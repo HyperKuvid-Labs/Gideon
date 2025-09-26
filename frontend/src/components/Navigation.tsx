@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Home, Code, Users, Menu, X, LogOut, User } from 'lucide-react';
+import { MessageSquare, Home, Code, Users, Menu, X, LogOut, User, Shield } from 'lucide-react';
 
 interface User {
   id: string;
@@ -12,8 +12,8 @@ interface User {
 }
 
 export interface NavigationProps {
-  currentView?: string; // Made optional since we'll get it from useLocation
-  onViewChange?: (view: string) => void; // Made optional since we'll use navigate
+  currentView?: string;
+  onViewChange?: (view: string) => void;
   onLogout: () => void;
   user?: User | null;
 }
@@ -29,7 +29,7 @@ const Navigation = ({ onLogout, user }: NavigationProps) => {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
+      setIsScrolled(window.scrollY > 10);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -55,32 +55,35 @@ const Navigation = ({ onLogout, user }: NavigationProps) => {
 
   return (
     <motion.nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 mb-10 py-4${
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 font-inter ${
         isScrolled
-          ? 'bg-slate-900/95 backdrop-blur-md border-b border-slate-800/50'
-          : 'bg-transparent'
+          ? 'bg-white/95 backdrop-blur-md border-b border-gray-200 shadow-sm'
+          : 'bg-white border-b border-gray-100'
       }`}
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      transition={{ duration: 0.6 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          {/* Logo */}
+          {/* Logo - Notion style */}
           <motion.div
-            className="flex-shrink-0 cursor-pointer"
+            className="flex-shrink-0 cursor-pointer flex items-center gap-2"
             onClick={() => handleNavigation('/')}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
           >
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-neon-blue to-neon-purple bg-clip-text text-transparent">
+            <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+              <Shield className="w-5 h-5 text-white" />
+            </div>
+            <h1 className="text-xl font-semibold text-black">
               Gideon
             </h1>
           </motion.div>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - Notion style */}
           <div className="hidden md:block">
-            <div className="ml-10 flex items-baseline space-x-4">
+            <div className="flex items-center space-x-1">
               {navItems.map((item, index) => {
                 const Icon = item.icon;
                 const isActive = currentView === item.id;
@@ -90,37 +93,29 @@ const Navigation = ({ onLogout, user }: NavigationProps) => {
                     key={item.id}
                     initial={{ opacity: 0, y: -20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    transition={{ duration: 0.6, delay: index * 0.1, ease: "easeOut" }}
                   >
                     <Button
                       onClick={() => handleNavigation(item.path)}
                       variant="ghost"
                       size="sm"
-                      className={`relative px-6 py-3 rounded-xl font-medium transition-all duration-300 group ${
+                      className={`relative px-4 py-2 rounded-md font-medium transition-all duration-200 ${
                         isActive
-                          ? 'text-white bg-gradient-to-r from-neon-blue/20 to-neon-purple/20 border border-neon-blue/30'
-                          : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                          ? 'text-black bg-gray-100'
+                          : 'text-gray-600 hover:text-black hover:bg-gray-50'
                       }`}
                     >
-                      {/* Background glow effect */}
-                      {isActive && (
-                        <motion.div
-                          className="absolute inset-0 bg-gradient-to-r from-neon-blue/10 to-neon-purple/10 rounded-xl blur-xl"
-                          layoutId="activeTab"
-                          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
-                        />
-                      )}
-
                       <Icon className="w-4 h-4 mr-2" />
                       {item.label}
 
-                      {/* Hover indicator */}
-                      <motion.div
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-neon-blue to-neon-purple rounded-full"
-                        initial={{ scaleX: 0 }}
-                        whileHover={{ scaleX: isActive ? 1 : 0.8 }}
-                        transition={{ duration: 0.3 }}
-                      />
+                      {/* Active indicator - Notion style */}
+                      {isActive && (
+                        <motion.div
+                          className="absolute bottom-0 left-1 right-1 h-0.5 bg-black rounded-full"
+                          layoutId="activeIndicator"
+                          transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+                        />
+                      )}
                     </Button>
                   </motion.div>
                 );
@@ -128,20 +123,20 @@ const Navigation = ({ onLogout, user }: NavigationProps) => {
             </div>
           </div>
 
-          {/* User Menu & Mobile Menu Button */}
-          <div className="flex items-center space-x-4">
+          {/* User Menu & Mobile Menu Button - Notion style */}
+          <div className="flex items-center space-x-3">
             {/* User Info (Desktop) */}
             {user && (
               <div className="hidden md:flex items-center space-x-3">
-                <div className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50">
-                  <User className="w-4 h-4 text-slate-400" />
-                  <span className="text-sm text-slate-300">{user.username}</span>
+                <div className="flex items-center space-x-2 px-3 py-1.5 rounded-md bg-gray-50 border border-gray-200">
+                  <User className="w-4 h-4 text-gray-500" />
+                  <span className="text-sm text-gray-700 font-medium">{user.username}</span>
                 </div>
                 <Button
                   onClick={onLogout}
                   variant="ghost"
                   size="sm"
-                  className="text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                  className="text-gray-500 hover:text-red-600 hover:bg-red-50 p-2"
                 >
                   <LogOut className="w-4 h-4" />
                 </Button>
@@ -151,20 +146,20 @@ const Navigation = ({ onLogout, user }: NavigationProps) => {
             {/* Mobile Menu Button */}
             <Button
               onClick={() => setIsMobileOpen(!isMobileOpen)}
-              className="md:hidden text-slate-400 hover:text-white"
+              className="md:hidden text-gray-500 hover:text-black hover:bg-gray-50 p-2"
               variant="ghost"
               size="sm"
             >
               {isMobileOpen ? (
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5" />
               ) : (
-                <Menu className="w-6 h-6" />
+                <Menu className="w-5 h-5" />
               )}
             </Button>
           </div>
         </div>
 
-        {/* Mobile Navigation */}
+        {/* Mobile Navigation - Notion style */}
         <AnimatePresence>
           {isMobileOpen && (
             <motion.div
@@ -174,7 +169,7 @@ const Navigation = ({ onLogout, user }: NavigationProps) => {
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="px-2 pt-2 pb-3 space-y-1 bg-slate-900/95 backdrop-blur-md rounded-b-2xl border-b border-slate-800/50">
+              <div className="py-3 space-y-1 border-t border-gray-100">
                 {navItems.map((item, index) => {
                   const Icon = item.icon;
                   const isActive = currentView === item.id;
@@ -189,10 +184,10 @@ const Navigation = ({ onLogout, user }: NavigationProps) => {
                       <Button
                         onClick={() => handleNavigation(item.path)}
                         variant="ghost"
-                        className={`w-full justify-start px-4 py-3 rounded-xl transition-all duration-300 ${
+                        className={`w-full justify-start px-4 py-3 rounded-md transition-all duration-200 ${
                           isActive
-                            ? 'text-white bg-gradient-to-r from-neon-blue/20 to-neon-purple/20 border border-neon-blue/30'
-                            : 'text-slate-400 hover:text-white hover:bg-slate-800/50'
+                            ? 'text-black bg-gray-100 border-l-2 border-black'
+                            : 'text-gray-600 hover:text-black hover:bg-gray-50'
                         }`}
                       >
                         <Icon className="w-5 h-5 mr-3" />
@@ -202,24 +197,24 @@ const Navigation = ({ onLogout, user }: NavigationProps) => {
                   );
                 })}
 
-                {/* Mobile User Menu */}
+                {/* Mobile User Menu - Notion style */}
                 {user && (
                   <motion.div
-                    className="pt-4 mt-4 border-t border-slate-700/50"
+                    className="pt-3 mt-3 border-t border-gray-100"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ duration: 0.3, delay: 0.4 }}
                   >
-                    <div className="flex items-center justify-between px-4 py-2 text-slate-300">
-                      <div className="flex items-center space-x-2">
-                        <User className="w-4 h-4" />
-                        <span className="text-sm">{user.username}</span>
+                    <div className="flex items-center justify-between px-4 py-2">
+                      <div className="flex items-center space-x-2 text-gray-700">
+                        <User className="w-4 h-4 text-gray-500" />
+                        <span className="text-sm font-medium">{user.username}</span>
                       </div>
                       <Button
                         onClick={onLogout}
                         variant="ghost"
                         size="sm"
-                        className="text-slate-400 hover:text-red-400 hover:bg-red-500/10"
+                        className="text-gray-500 hover:text-red-600 hover:bg-red-50 p-2"
                       >
                         <LogOut className="w-4 h-4" />
                       </Button>

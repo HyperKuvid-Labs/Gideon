@@ -1307,7 +1307,7 @@ async def get_current_user(current_user: User = Depends(get_current_user)):
 
 @app.get("/login/google")
 async def signup(request: Request):
-    redirect_uri = "https://gideon-1.onrender.com/auth/google"
+    redirect_uri = "http://localhost:8000/auth/google"
     return await oauth.google.authorize_redirect(request, redirect_uri)
 
 
@@ -1340,10 +1340,10 @@ async def auth_google(request: Request):
         html_content = f"""
             <script>
                 if (window.opener) {{
-                    window.opener.postMessage({{ token: '{access_token}' }}, 'https://gideon-eta.vercel.app');
+                    window.opener.postMessage({{ token: '{access_token}' }}, 'http://localhost:8080');
                     window.close();
                 }} else {{
-                    window.location.href = 'https://gideon-eta.vercel.app?token={access_token}';
+                    window.location.href = 'http://localhost:8080?token={access_token}';
                 }}
             </script>
         """
@@ -1431,7 +1431,7 @@ async def register(user_data: UserModel):
 @app.get("/logout")
 async def logout(request: Request):
     request.session.clear()
-    return RedirectResponse(url="https://gideon-eta.vercel.app")
+    return RedirectResponse(url="http://localhost:8080")
 
 @app.get("/conversations/{conversationId}/history")
 async def get_conversation_history(conversation_id : int, current_user = Depends(get_current_user)):
@@ -2746,7 +2746,7 @@ async def generate_images(
     current_user: User = Depends(get_current_user)
 ):
     try:
-        client = genai.Client(api_key=GEMINI_API_KEY)
+        client = genai.Client(api_key="AIzaSyAxlaAthy3YF2Ul15VdgCwPhSoOyGK2hWk")
         
         response = client.models.generate_images(
             model='imagen-3.0-generate-002',

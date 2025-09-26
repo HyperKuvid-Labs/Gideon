@@ -246,9 +246,9 @@ const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorProps) => 
 
   const getSpeedIcon = useCallback((speed: string) => {
     switch (speed) {
-      case 'Fast': return <Zap className="w-4 h-4 text-emerald-600" />;
-      case 'Medium': return <Cpu className="w-4 h-4 text-amber-600" />;
-      case 'Slow': return <Clock className="w-4 h-4 text-red-600" />;
+      case 'Fast': return <Zap className="w-4 h-4 text-gray-600" />;
+      case 'Medium': return <Cpu className="w-4 h-4 text-gray-600" />;
+      case 'Slow': return <Clock className="w-4 h-4 text-gray-600" />;
       default: return null;
     }
   }, []);
@@ -260,79 +260,78 @@ const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorProps) => 
     return (
       <div
         onClick={() => handleModelSelect(model.id)}
-        className={`p-3 cursor-pointer border rounded-lg transition-colors duration-200 ${
+        className={`p-3 cursor-pointer rounded transition-colors duration-200 ${
           isSelected
-            ? "border-blue-500 bg-white shadow-sm"
+            ? "bg-gray-100 border-l-2 border-black"
             : isFocused
-            ? "border-indigo-400 bg-indigo-50"
-            : "border-gray-200 hover:border-indigo-300 hover:bg-slate-50"
+            ? "bg-gray-50"
+            : "hover:bg-gray-50"
         }`}
         role="option"
         aria-selected={isSelected}
         tabIndex={-1}
       >
         <div className="flex items-start justify-between">
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 mb-1">
-              <span className="font-semibold text-slate-800">{model.name}</span>
+              <span className="font-medium text-black text-sm truncate">{model.name}</span>
               {model.badge && (
                 <Badge
-                  variant={model.isNew ? "default" : "secondary"}
-                  className={`text-xs font-medium ${
+                  variant="secondary"
+                  className={`text-xs px-2 py-0.5 ${
                     model.badge === "NEW" 
-                      ? "bg-emerald-100 text-emerald-700 border-emerald-300" 
-                      : model.badge === "Popular"
-                      ? "bg-amber-100 text-amber-700 border-amber-300"
-                      : "bg-slate-100 text-slate-700 border-slate-300"
+                      ? "bg-black text-white" 
+                      : "bg-gray-100 text-gray-700"
                   }`}
                 >
                   {model.badge}
                 </Badge>
               )}
             </div>
-            <p className="text-sm text-slate-600 mb-2 leading-relaxed">{model.description}</p>
-            <div className="flex items-center gap-4 text-xs">
+            <p className="text-xs text-gray-600 mb-2 line-clamp-2 leading-relaxed">{model.description}</p>
+            <div className="flex items-center gap-3 text-xs">
               <div className="flex items-center gap-1">
                 {getSpeedIcon(model.speed)}
-                <span className="text-slate-700 font-medium">{model.speed}</span>
+                <span className="text-gray-600">{model.speed}</span>
               </div>
-              <span className="text-indigo-600 font-medium">{model.contextLength}</span>
-              <span className="text-teal-600 font-medium">{model.provider}</span>
+              <span className="text-gray-600">{model.contextLength}</span>
+              <span className="text-gray-600">{model.provider}</span>
             </div>
           </div>
-          {isSelected && <Check className="w-5 h-5 text-blue-600 flex-shrink-0" />}
+          {isSelected && <Check className="w-4 h-4 text-black flex-shrink-0 mt-0.5" />}
         </div>
       </div>
     );
   };
 
   return (
-    <div className="relative">
+    <div className="relative font-inter">
       <Button
         ref={buttonRef}
         onClick={() => setIsOpen(!isOpen)}
         variant="outline"
-        className="justify-between w-full h-12 px-4 border-slate-300 hover:border-indigo-400 hover:bg-slate-50 transition-colors duration-200"
+        className="justify-between w-full h-11 px-3 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-colors bg-white text-left"
         aria-expanded={isOpen}
         aria-haspopup="listbox"
         aria-label="Select AI model"
       >
-        <div className="text-left">
-          <div className="font-semibold text-slate-800">{selectedModelData?.name || 'Select Model'}</div>
-          <div className="text-sm text-slate-500">{selectedModelData?.provider || 'Choose your AI assistant'}</div>
+        <div className="text-left min-w-0 flex-1">
+          <div className="font-medium text-black text-sm truncate">{selectedModelData?.name || 'Select Model'}</div>
+          <div className="text-xs text-gray-500 truncate">{selectedModelData?.provider || 'Choose your AI assistant'}</div>
         </div>
-        <ChevronDown className={`w-4 h-4 transition-transform duration-200 text-slate-600 ${isOpen ? 'rotate-180' : ''}`} />
+        <ChevronDown className={`w-4 h-4 transition-transform duration-200 text-gray-500 flex-shrink-0 ${isOpen ? 'rotate-180' : ''}`} />
       </Button>
 
       {isOpen && (
         <div
           ref={dropdownRef}
-          className="absolute z-50 w-full mt-2 bg-white border border-slate-200 rounded-lg shadow-xl max-h-96 overflow-y-auto"
+          className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-96 overflow-y-auto"
           role="listbox"
         >
-          <div className="p-3 border-b border-slate-200 bg-slate-50">
+          {/* Search Header - Notion style */}
+          <div className="p-3 border-b border-gray-100 bg-gray-50">
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
               <input
                 ref={searchInputRef}
                 type="text"
@@ -342,7 +341,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorProps) => 
                   setSearchTerm(e.target.value);
                   setFocusedIndex(-1);
                 }}
-                className="w-full pl-10 pr-10 py-2 border border-slate-300 rounded-lg bg-white focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200 transition-colors duration-200"
+                className="w-full pl-9 pr-9 py-2 border border-gray-200 rounded bg-white focus:outline-none focus:border-gray-400 focus:ring-0 transition-colors text-sm"
                 autoComplete="off"
                 role="searchbox"
                 aria-label="Search models"
@@ -354,7 +353,7 @@ const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorProps) => 
                     setFocusedIndex(-1);
                     searchInputRef.current?.focus();
                   }}
-                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-slate-600 transition-colors duration-200"
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <X className="w-4 h-4" />
                 </button>
@@ -362,11 +361,12 @@ const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorProps) => 
             </div>
           </div>
 
-          <div className="p-3 bg-gradient-to-b from-slate-50 to-white">
+          {/* Model Lists - Notion style */}
+          <div className="p-2">
             {mainModels.length > 0 && (
               <div className="mb-4">
-                <h3 className="px-2 py-1 text-sm font-semibold text-indigo-700 mb-3">Featured Models</h3>
-                <div className="space-y-2">
+                <h3 className="px-2 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Featured Models</h3>
+                <div className="space-y-1">
                   {mainModels.map((model, index) => (
                     <ModelItem key={model.id} model={model} index={index} />
                   ))}
@@ -376,9 +376,9 @@ const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorProps) => 
 
             {localModels.length > 0 && (
               <div>
-                <h3 className="px-2 py-1 text-sm font-semibold text-teal-700">Local Models (Ollama)</h3>
-                <p className='text-xs text-slate-500 px-2 py-1 mb-3'>For faster inference.</p>
-                <div className="space-y-2">
+                <h3 className="px-2 py-2 text-xs font-medium text-gray-500 uppercase tracking-wide">Local Models</h3>
+                <p className='text-xs text-gray-400 px-2 pb-2'>For faster inference</p>
+                <div className="space-y-1">
                   {localModels.map((model, index) => (
                     <ModelItem key={model.id} model={model} index={mainModels.length + index} />
                   ))}
@@ -387,12 +387,12 @@ const ModelSelector = ({ selectedModel, onModelSelect }: ModelSelectorProps) => 
             )}
 
             {filteredModels.length === 0 && (
-              <div className="p-6 text-center">
-                <div className="text-slate-400 mb-2">
-                  <Search className="w-8 h-8 mx-auto mb-2" />
+              <div className="p-8 text-center">
+                <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3">
+                  <Search className="w-6 h-6 text-gray-400" />
                 </div>
-                <p className="text-slate-600 font-medium">No models found</p>
-                <p className="text-sm text-slate-500">Try adjusting your search terms</p>
+                <p className="text-sm font-medium text-black mb-1">No models found</p>
+                <p className="text-xs text-gray-500">Try adjusting your search terms</p>
               </div>
             )}
           </div>

@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { MessageSquare, Code, History, Sparkles } from 'lucide-react';
+import { MessageSquare, Code, History, Crown } from 'lucide-react';
 
 interface Tab {
   id: string;
@@ -36,7 +35,7 @@ const ChatTabs = ({ activeTab, onTabChange }: ChatTabsProps) => {
             break;
           case '2':
             e.preventDefault();
-            onTabChange('build');
+            onTabChange('conversation tree');
             break;
           case '3':
             e.preventDefault();
@@ -51,117 +50,68 @@ const ChatTabs = ({ activeTab, onTabChange }: ChatTabsProps) => {
   }, [onTabChange]);
 
   return (
-    <div className="relative">
-      {/* Tab Navigation */}
-      <div className="flex items-center gap-2 p-2 bg-zinc-900/50 rounded-xl border border-zinc-800">
-        {tabs.map((tab) => {
-          const Icon = tab.icon;
-          const isActive = activeTab === tab.id;
-          const isHovered = hoveredTab === tab.id;
+    <div className="relative border-b border-gray-200 bg-white">
+      {/* Tab Navigation - Notion style */}
+      <div className="flex items-center justify-between px-6">
+        <div className="flex items-center">
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            const isActive = activeTab === tab.id;
+            const isHovered = hoveredTab === tab.id;
 
-          return (
-            <motion.div
-              key={tab.id}
-              className="relative"
-              onMouseEnter={() => setHoveredTab(tab.id)}
-              onMouseLeave={() => setHoveredTab(null)}
-            >
-              {/* Active tab indicator */}
-              {isActive && (
-                <motion.div
-                  className="absolute inset-0 bg-zinc-800 rounded-lg border border-neon-blue/30"
-                  layoutId="activeTab"
-                  transition={{ duration: 0.15, ease: "easeOut" }}
-                />
-              )}
-
-              <Button
-                onClick={() => onTabChange(tab.id)}
-                variant="ghost"
-                size="sm"
-                className={`relative z-10 h-10 px-4 font-medium tracking-tight transition-all duration-150 ease-out ${
-                  isActive
-                    ? 'text-white bg-transparent shadow-lg'
-                    : 'text-zinc-400 hover:text-white hover:bg-zinc-800/50'
-                }`}
+            return (
+              <div
+                key={tab.id}
+                className="relative"
+                onMouseEnter={() => setHoveredTab(tab.id)}
+                onMouseLeave={() => setHoveredTab(null)}
               >
-                <motion.div
-                  className="flex items-center gap-2"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                <Button
+                  onClick={() => onTabChange(tab.id)}
+                  variant="ghost"
+                  size="sm"
+                  className={`relative h-12 px-4 font-medium text-sm border-b-2 rounded-none transition-all duration-200 ${
+                    isActive
+                      ? 'text-black border-black bg-transparent hover:bg-gray-50'
+                      : 'text-gray-600 border-transparent hover:text-gray-900 hover:bg-gray-50'
+                  }`}
                 >
-                  <motion.div
-                    animate={{
-                      rotate: isActive ? [0, 5, -5, 0] : 0,
-                      scale: isHovered || isActive ? 1.1 : 1,
-                    }}
-                    transition={{
-                      rotate: { duration: 0.3, ease: "easeInOut" },
-                      scale: { duration: 0.15 }
-                    }}
-                  >
+                  <div className="flex items-center gap-2">
                     <Icon className={`w-4 h-4 ${
                       isActive 
-                        ? 'text-neon-blue' 
-                        : isHovered 
-                        ? 'text-neon-blue/70' 
-                        : 'text-zinc-500'
+                        ? 'text-black' 
+                        : 'text-gray-500'
                     }`} />
-                  </motion.div>
-                  <span>{tab.label}</span>
-                  
-                  {/* Keyboard shortcut hint */}
-                  <motion.span
-                    className="text-xs text-zinc-600 ml-1 hidden sm:inline"
-                    animate={{ opacity: isHovered ? 1 : 0.6 }}
-                  >
-                    {tab.shortcut.replace('Ctrl', '⌘')}
-                  </motion.span>
-                </motion.div>
+                    <span>{tab.label}</span>
+                    
+                    {/* Keyboard shortcut hint - Notion style */}
+                    <span className="text-xs text-gray-400 ml-2 hidden md:inline font-mono">
+                      {tab.shortcut.replace('Ctrl', '⌘')}
+                    </span>
+                  </div>
+                </Button>
 
-                {/* Ripple effect on click */}
-                <motion.div
-                  className="absolute inset-0 rounded-lg"
-                  initial={{ scale: 0, opacity: 0.3 }}
-                  whileTap={{ scale: 1.2, opacity: 0 }}
-                  transition={{ duration: 0.2 }}
-                  style={{
-                    background: 'radial-gradient(circle, rgba(0, 191, 255, 0.3) 0%, transparent 70%)'
-                  }}
-                />
-              </Button>
+                {/* Subtle hover indicator */}
+                {!isActive && isHovered && (
+                  <motion.div
+                    className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-300"
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    exit={{ scaleX: 0 }}
+                    transition={{ duration: 0.2 }}
+                  />
+                )}
+              </div>
+            );
+          })}
+        </div>
 
-              {/* Hover underline indicator */}
-              {!isActive && isHovered && (
-                <motion.div
-                  className="absolute bottom-0 left-1/2 w-8 h-0.5 bg-gradient-to-r from-neon-blue to-neon-purple rounded-full"
-                  initial={{ width: 0, x: '-50%' }}
-                  animate={{ width: 32, x: '-50%' }}
-                  exit={{ width: 0, x: '-50%' }}
-                  transition={{ duration: 0.2 }}
-                />
-              )}
-            </motion.div>
-          );
-        })}
-
-        {/* Pro indicator */}
-        <motion.div
-          className="ml-auto flex items-center gap-1 px-3 py-1 bg-gradient-to-r from-neon-purple/20 to-pink-500/20 border border-neon-purple/30 rounded-lg"
-          whileHover={{ scale: 1.05 }}
-          transition={{ duration: 0.2 }}
-        >
-          <Sparkles className="w-3 h-3 text-neon-purple" />
-          <span className="text-xs font-medium text-neon-purple">Pro</span>
-        </motion.div>
+        {/* Pro indicator - Notion style */}
+        <div className="flex items-center gap-2 px-3 py-1.5 bg-gray-50 border border-gray-200 rounded-md">
+          <Crown className="w-3 h-3 text-gray-600" />
+          <span className="text-xs font-medium text-gray-700">Pro</span>
+        </div>
       </div>
-
-      {/* Tab content indicators */}
-      <motion.div
-        className="absolute -bottom-1 left-0 right-0 h-px bg-gradient-to-r from-transparent via-neon-blue/30 to-transparent"
-        animate={{ opacity: [0.3, 0.7, 0.3] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-      />
     </div>
   );
 };
